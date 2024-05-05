@@ -1,3 +1,5 @@
+#include <EYW.h>
+
   //port 12 LED
   //port 9 and 8 ultra sonic sensor
   //port 7 motor/servo
@@ -12,7 +14,7 @@ Altimeter
 Measures the height above a reference altitude
 */
 
-#include <EYW.h> 
+
 
 EYW::Altimeter myaltimeter;  // this line names the altimeter "myaltimeter"
 float current_height=0;      // declares a decimal (float) variable named “current_height” and sets it to zero
@@ -37,14 +39,14 @@ Rotates servo to depress camera shutter
 */
 
 EYW::Camera cameraservo; // this line names the servo "cameraservo"
-
+bool button = false;
 
 
 
 void setup() {
   // put your setup code here, to run once:
 /*altimeter*/
-Serial.begin(9600);  
+  Serial.begin(9600);  
   myaltimeter.begin();  // required; initializes the altimeter; no arguments required
   current_height = myaltimeter.getHeight();  // sets variable 'current_height' to the pre-calibrated sensor reading
   Serial.print("Pre-calibration height reading in meters: ");   
@@ -73,6 +75,17 @@ Serial.begin(9600);
 void loop() {
   // put your main code here, to run repeatedly:
   //altimeter
+
+  if(digitalRead(11)){
+    button = true;
+
+  }
+  else{
+    return void; 
+  }
+  
+  
+  
   current_height = myaltimeter.getHeightAvg(50);  // takes 50 measurements, sets it equal to "current_height" variable 
     // You can get more accurate readings with a higher number but your readings will be slower
   Serial.print("Current Height in meters: ");   
@@ -81,7 +94,7 @@ void loop() {
   {
     myaltimeter.alarm(6,800,500);  // sound alarm 6 times at 800 Hz
     digitalWrite(led, HIGH);
-    delay(500)
+    delay(500);
     digitalWrite(led, LOW);
   }
 
@@ -93,7 +106,7 @@ void loop() {
                                                                 // seconds before returning to its original position
     myaltimeter.alarm(3,880,1000);    // plays 3 notes at 880 Hz for 1 second each.  Each argument must be an integer
     digitalWrite(led, HIGH);
-    delay(500)
+    delay(500);
     digitalWrite(led, LOW);
   }
 
@@ -105,7 +118,7 @@ void loop() {
                                                                 // seconds before returning to its original position
     myaltimeter.alarm(3,880,1000);    // plays 3 notes at 880 Hz for 1 second each.  Each argument must be an integer
     digitalWrite(led, HIGH);
-    delay(500)
+    delay(500);
     digitalWrite(led, LOW);
   }
 
@@ -117,7 +130,7 @@ void loop() {
                                                                 // seconds before returning to its original position
     myaltimeter.alarm(3,880,1000);    // plays 3 notes at 880 Hz for 1 second each.  Each argument must be an integer
     digitalWrite(led, HIGH);
-    delay(500)
+    delay(500);
     digitalWrite(led, LOW);
   }
 
@@ -147,7 +160,7 @@ void loop() {
                                                                 // for 1 second at 20 degrees, then go back to 90 degrees, and waits 1.75
                                                                 // seconds before returning to its original position
   //}
-
+  
   
 
   
