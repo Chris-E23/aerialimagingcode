@@ -14,6 +14,7 @@ UltraSonicDistanceSensor proximity(6, 7);
   int targetHeight1 = 100;
   int targetHeight2 = 2;
   int targetHeight3 = 3;
+  int speakerPin = 5;
 // this library is required when using the ultrasonic rangefinder sensor
 
 EYW::Camera cameraservo; 
@@ -47,6 +48,9 @@ void loop() {
     Serial.println(distance);
     if(distance == targetHeight1){
           cameraservo.getPicture(500,100);
+          tone(speakerPin, 250); 
+          delay(200);
+          noTone(speakerPin); 
     }
 
   }
