@@ -1,6 +1,8 @@
 #include <EYW.h>
 #include <HCSR04.h> 
 UltraSonicDistanceSensor proximity(6, 7); 
+#include <Adafruit_BMP085.h>
+
 
   //port 12 LED
   //port 9 and 8 ultra sonic sensor
@@ -11,34 +13,41 @@ UltraSonicDistanceSensor proximity(6, 7);
   int led = 12;  // Pin 13 has an LED connected on most Arduino boards.  Give it a name:
   int button = 2;
   int distance = 0; 
-  int targetHeight1 = 180;
-  int targetHeight2 = 2;
-  int targetHeight3 = 3;
+  int height = 100;
 
 // this library is required when using the ultrasonic rangefinder sensor
 
 EYW::Camera cameraservo; 
 bool buttonBool = false;
-
-EYW::Altimeter altitude;
 int speakerPin = 5;
 int ledPin = 4;
 float currentHeight=0; // declares a decimal (float) variable named “current_height” and sets it to zero
 bool heightAchieved = false; 
-
+Adafruit_BMP085 bmp;
+int startHeight = 0; 
+bool timerEnded = false;
+int altitude = 0;
+bool calibrated = false;  
+int timer = 30000;
 
 void setup() {
  
   Serial.begin(9600);
-  
+    if (!bmp.begin()) {
+	Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+	while (1) {}
+  }
   cameraservo.begin(2,4,5);  
-  cameraservo.calibrate(50,90);  
+  cameraservo.calibrate(40,100);  
   pinMode(led, OUTPUT);    
-  altitude.begin(); // required; initializes the altimeter; no arguments required
-altitude.calibrate(100);
   tone(speakerPin, 250); 
-          delay(200);
-          noTone(speakerPin); 
+  delay(400);
+  noTone(speakerPin); 
+  
+  
+ 
+  
+
 
 }
 
@@ -47,24 +56,51 @@ void loop() {
     buttonBool = true; 
   }
 
-  
-  if(buttonBool){
-    
-    digitalWrite(led, HIGH);
-    
-    distance = proximity.measureDistanceCm();
-    Serial.print("Current Distance: ");    
-    Serial.println(distance);
-    //currentHeight = altitude.getHeightAvg(50); // takes 50 measurements, sets it equal to "current_height" variable
-    // You can get more accurate readings with a higher number but your readings will be slower
-    Serial.print("Current Height in meters: "); // prints current distance value to the serial monitor
-    //Serial.println(currentHeight);
-    if(distance == targetHeight1){
-          cameraservo.getPicture(200,100);
-          tone(speakerPin, 250); 
-          delay(200);
-          noTone(speakerPin); 
+  if(!timerEnded && buttonBool){
+    delay(timer);
+    timerEnded = true; 
+     tone(speakerPin, 500); 
+    delay(400);
+    noTone(speakerPin); 
+    if(!calibrated){
+      startHeight = bmp.readAltitude(101500);
+      Serial.print("Start altitude = ");
+      Serial.print(bmp.readAltitude(101500));
+      Serial.println(" meters");
+      calibrated = true; 
+
     }
+
+  }
+  if(buttonBool && timerEnded){
+    digitalWrite(led, HIGH);
+   //distance = proximity.measureDistanceCm();
+   // Serial.print("Current Distance: ");    
+    //Serial.println(distance);
+
+    altitude = bmp.readAltitude(101500);
+    if((int)altitude <= (int)(startHeight - 1)){
+      Serial.print("Real altitude = ");
+      Serial.print(bmp.readAltitude(101500));
+      Serial.println(" meters");
+      cameraservo.getPicture(200,100);
+      tone(speakerPin, 250); 
+      delay(400);
+      noTone(speakerPin); 
+           
+    }
+
+   // Serial.print("Real altitude = ");
+    //Serial.print(bmp.readAltitude(101500));
+    //Serial.println(" meters");
+
+    //if(distance == height){
+         //cameraservo.getPicture(200,100);
+        //  tone(speakerPin, 250); 
+        // delay(400);
+         // noTone(speakerPin); 
+   // }
+ 
 
   }
 
